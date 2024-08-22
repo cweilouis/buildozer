@@ -775,7 +775,7 @@ class TargetAndroid(Target):
     def compile_platform(self):
         app_requirements = self.buildozer.config.getlist(
             'app', 'requirements', '')
-        dist_name = self.buildozer.config.get('app', 'package.name')
+        dist_name = self.buildozer.config.get('app', 'dist.name')
         local_recipes = self.get_local_recipes_dir()
         requirements = ','.join(app_requirements)
         options = []
@@ -830,7 +830,7 @@ class TargetAndroid(Target):
 
     def execute_build_package(self, build_cmd):
         # wrapper from previous old_toolchain to new toolchain
-        dist_name = self.buildozer.config.get('app', 'package.name')
+        dist_name = self.buildozer.config.get('app', 'dist.name')
         local_recipes = self.get_local_recipes_dir()
         cmd = [self.artifact_format, "--bootstrap", self._p4a_bootstrap, "--dist_name", dist_name]
         for args in build_cmd:
@@ -1083,7 +1083,7 @@ class TargetAndroid(Target):
                 fd.write(wl + '\n')
 
     def build_package(self):
-        dist_name = self.buildozer.config.get('app', 'package.name')
+        dist_name = self.buildozer.config.get('app', 'dist.name')
         dist_dir = self.get_dist_dir(dist_name)
         config = self.buildozer.config
         package = self._get_package()
@@ -1340,14 +1340,25 @@ class TargetAndroid(Target):
                 mode=mode)
             artifact_dir = join(dist_dir, "bin")
 
-        artifact_dest = u'{packagename}-{version}-{arch}-{mode}.{artifact_format}'.format(
-            packagename=packagename, mode=mode, version=version,
-            arch=self.archs_snake, artifact_format=self.artifact_format)
+        # artifact_dest = u'{packagename}-{version}-{arch}-{mode}.{artifact_format}'.format(
+        #     packagename=packagename, mode=mode, version=version,
+        #     arch=self.archs_snake, artifact_format=self.artifact_format)
+
+        artifact_dest = u'{dist_name}-{version}-{mode}.{artifact_format}'.format(
+            dist_name=dist_name, version=version, mode=mode,
+             artifact_format=self.artifact_format)
 
         # copy to our place
         buildops.file_copy(
             join(artifact_dir, artifact),
             join(self.buildozer.bin_dir, artifact_dest))
+
+        #
+        self.logger.info(f'artifact_dir:{artifact_dir}')
+        self.logger.info(f'artifact:{artifact}')
+        self.logger.info(f'self.buildozer.bin_dir:{self.buildozer.bin_dir}')
+        self.logger.info(f'artifact_dest:{artifact_dest}')
+        #
 
         self.logger.info('Android packaging done!')
         self.logger.info(
