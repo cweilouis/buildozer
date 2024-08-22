@@ -1072,7 +1072,8 @@ class TargetAndroid(Target):
         package = config.get('app', 'package.name')
         if package_domain:
             package = package_domain + '.' + package
-        return package.lower()
+        #return package.lower()
+        return package
 
     def _generate_whitelist(self, dist_dir):
         p4a_whitelist = self.buildozer.config.getlist(
